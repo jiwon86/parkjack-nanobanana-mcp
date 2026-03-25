@@ -15,13 +15,13 @@ Google 문서 기준으로 Nano Banana 이미지는 `models.generateContent` RES
 
 ## 설치
 
-PyPI에 배포한 뒤에는:
+로컬에서 직접 실행하거나 테스트하려면:
 
 ```bash
 pip install parkjack-nanobanana-mcp
 ```
 
-저장소에서 직접 설치하려면:
+저장소에서 직접 작업하려면:
 
 ```bash
 python3 -m venv .venv
@@ -61,13 +61,16 @@ python -m nanobanana_mcp
 
 예를 들어 `mcp.json`이나 클라이언트 설정에 아래처럼 등록할 수 있습니다.
 
+Claude Code 등에서 설치 없이 바로 쓰려면 `uvx` 방식이 가장 간단합니다.
+
 Linux / macOS / WSL:
 
 ```json
 {
   "mcpServers": {
     "nano-banana": {
-      "command": "parkjack-nanobanana-mcp",
+      "command": "uvx",
+      "args": ["parkjack-nanobanana-mcp"],
       "env": {
         "GEMINI_API_KEY": "YOUR_API_KEY",
         "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
@@ -78,6 +81,23 @@ Linux / macOS / WSL:
 ```
 
 Windows:
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "uvx",
+      "args": ["parkjack-nanobanana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "YOUR_API_KEY",
+        "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
+      }
+    }
+  }
+}
+```
+
+이미 설치된 실행 파일을 직접 쓰고 싶다면 아래처럼 등록해도 됩니다.
 
 ```json
 {
