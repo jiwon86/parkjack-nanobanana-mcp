@@ -1,103 +1,69 @@
 # Nano Banana MCP
 
-Google Gemini API의 Nano Banana 이미지 생성 기능을 MCP 서버로 감싼 예제입니다.
+Google Gemini API의 Nano Banana 이미지 생성 기능을 MCP 서버로 감싼 Python 패키지입니다. Claude Code 같은 MCP 클라이언트에서 바로 연결해 텍스트-투-이미지, 이미지 편집, 검색 그라운딩 워크플로를 사용할 수 있습니다.
 
-PyPI 배포용 패키지 이름: `parkjack-nanobanana-mcp`
-
+- PyPI: `parkjack-nanobanana-mcp`
+- GitHub: `jiwon86/parkjack-nanobanana-mcp`
 - 기본 모델: `gemini-3.1-flash-image-preview`
-- 지원 기능: 텍스트-투-이미지, 이미지 편집, 검색 그라운딩, 결과 이미지 파일 저장
-- 전송 방식: 기본 `stdio` (`FastMCP`)
-- 모델 선택: 툴 호출마다 변경 가능, 또는 환경 변수로 기본값 지정 가능
+- 추천 실행 방식: `uvx`
 
-## 왜 이렇게 만들었나
+## Highlights
 
-Google 문서 기준으로 Nano Banana 이미지는 `models.generateContent` REST 엔드포인트로 호출할 수 있습니다. 텍스트만 보내면 생성, 이미지와 텍스트를 같이 보내면 편집 흐름으로 사용할 수 있어서 MCP 툴 하나로 대부분의 워크플로를 감쌀 수 있습니다.
+- Claude Code에서 `uvx` 한 줄로 바로 연결 가능
+- 텍스트 생성과 이미지 편집을 하나의 MCP 툴로 처리
+- `gemini-3.1-flash-image-preview`, `gemini-3-pro-image-preview`, `gemini-2.5-flash-image` 지원
+- 생성 이미지를 로컬 파일로 저장하고 경로, 해시, 메타데이터 반환
+- 웹/이미지 검색 그라운딩 옵션 지원
 
-## 설치
+## Quickstart
 
-로컬에서 직접 실행하거나 테스트하려면:
+Claude Code에서 가장 간단하게 붙이는 방법입니다.
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "uvx",
+      "args": ["parkjack-nanobanana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "YOUR_API_KEY",
+        "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
+      }
+    }
+  }
+}
+```
+
+추가 후 Claude Code 안에서 `/mcp`로 연결 상태를 확인하면 됩니다.
+
+## Installation Options
+
+### 1. Zero-install with `uvx` (Recommended)
+
+Python CLI를 설치 없이 실행하고 싶다면 `uvx`가 가장 깔끔합니다.
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "uvx",
+      "args": ["parkjack-nanobanana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "YOUR_API_KEY",
+        "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
+      }
+    }
+  }
+}
+```
+
+### 2. Installed CLI
+
+직접 설치한 실행 파일을 쓰고 싶다면:
 
 ```bash
 pip install parkjack-nanobanana-mcp
 ```
-
-저장소에서 직접 작업하려면:
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -e .
-```
-
-환경 변수:
-
-```bash
-export GEMINI_API_KEY="YOUR_API_KEY"
-export NANOBANANA_DEFAULT_MODEL="gemini-3.1-flash-image-preview"
-```
-
-`.env.example`도 같이 제공됩니다.
-
-- `GEMINI_API_KEY`가 없으면 `GOOGLE_API_KEY`도 자동으로 확인합니다.
-- `NANOBANANA_DEFAULT_MODEL`으로 서버 기본 모델을 바꿀 수 있습니다.
-
-## 실행
-
-```bash
-. .venv/bin/activate
-parkjack-nanobanana-mcp
-```
-
-또는:
-
-```bash
-. .venv/bin/activate
-python -m nanobanana_mcp
-```
-
-기본 transport는 `stdio`입니다. `NANOBANANA_MCP_TRANSPORT=streamable-http`로 바꾸면 FastMCP의 HTTP transport로 실행할 수 있습니다.
-
-## MCP 등록 예시
-
-예를 들어 `mcp.json`이나 클라이언트 설정에 아래처럼 등록할 수 있습니다.
-
-Claude Code 등에서 설치 없이 바로 쓰려면 `uvx` 방식이 가장 간단합니다.
-
-Linux / macOS / WSL:
-
-```json
-{
-  "mcpServers": {
-    "nano-banana": {
-      "command": "uvx",
-      "args": ["parkjack-nanobanana-mcp"],
-      "env": {
-        "GEMINI_API_KEY": "YOUR_API_KEY",
-        "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
-      }
-    }
-  }
-}
-```
-
-Windows:
-
-```json
-{
-  "mcpServers": {
-    "nano-banana": {
-      "command": "uvx",
-      "args": ["parkjack-nanobanana-mcp"],
-      "env": {
-        "GEMINI_API_KEY": "YOUR_API_KEY",
-        "NANOBANANA_DEFAULT_MODEL": "gemini-3.1-flash-image-preview"
-      }
-    }
-  }
-}
-```
-
-이미 설치된 실행 파일을 직접 쓰고 싶다면 아래처럼 등록해도 됩니다.
 
 ```json
 {
@@ -113,30 +79,66 @@ Windows:
 }
 ```
 
-저장소를 직접 clone해서 쓰는 경우에는 기존처럼 Python 경로 + `-m nanobanana_mcp` 방식으로 등록해도 됩니다.
+### 3. Local Development
 
-## 제공 툴
+저장소에서 직접 작업하거나 수정하면서 실행하려면:
 
-### `nano_banana_models`
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e .
+```
 
-지원 모델과 문서상 특징을 반환합니다.
+직접 실행:
+
+```bash
+. .venv/bin/activate
+parkjack-nanobanana-mcp
+```
+
+또는:
+
+```bash
+. .venv/bin/activate
+python -m nanobanana_mcp
+```
+
+## Configuration
+
+지원 환경 변수:
+
+- `GEMINI_API_KEY`: Gemini API 키
+- `GOOGLE_API_KEY`: `GEMINI_API_KEY` 대체 키
+- `NANOBANANA_DEFAULT_MODEL`: 기본 모델 지정
+- `NANOBANANA_OUTPUT_DIR`: 생성 이미지 저장 디렉터리
+- `NANOBANANA_MCP_TRANSPORT`: 기본값 `stdio`, 필요 시 `streamable-http`
+
+예시:
+
+```bash
+export GEMINI_API_KEY="YOUR_API_KEY"
+export NANOBANANA_DEFAULT_MODEL="gemini-3.1-flash-image-preview"
+```
+
+`.env.example`도 같이 제공됩니다.
+
+## Tooling
 
 ### `nano_banana_generate_image`
 
-텍스트 생성과 이미지 편집을 모두 처리합니다.
+텍스트 생성과 이미지 편집을 모두 처리하는 메인 툴입니다.
 
 주요 인자:
 
 - `prompt`: 생성 또는 편집 지시문
-- `image_paths`: 입력 이미지 경로 목록. 비우면 text-to-image, 넣으면 image-to-image/edit
-- `model`: 호출마다 모델 선택 가능. 생략하면 서버 기본값 사용
+- `image_paths`: 입력 이미지 경로 목록. 비우면 text-to-image, 넣으면 image edit
+- `model`: 사용할 모델. 생략하면 서버 기본값 사용
 - `aspect_ratio`: 예시 `1:1`, `16:9`, `9:16`
 - `image_size`: `512`, `1K`, `2K`, `4K`
-  `gemini-2.5-flash-image`에서는 자동 무시됨
-- `include_text`: 텍스트 설명도 함께 받고 싶을 때 `true`
-- `enable_web_search`: 웹 검색 그라운딩 사용
-- `enable_image_search`: 이미지 검색 그라운딩 사용
-- `output_dir`: 결과 파일을 저장할 디렉터리
+- `include_text`: 이미지와 함께 텍스트 설명도 받고 싶을 때 사용
+- `enable_web_search`: 웹 검색 그라운딩
+- `enable_image_search`: 이미지 검색 그라운딩
+- `output_dir`: 결과 파일 저장 경로
 
 반환값:
 
@@ -146,18 +148,22 @@ Windows:
 - 사용량 메타데이터
 - 검색 그라운딩 메타데이터
 
-## 모델 변경 방식
+### `nano_banana_models`
 
-사용자는 두 가지 방식으로 모델을 바꿀 수 있습니다.
+지원 모델, 기본 모델, 모델별 제약사항을 반환합니다.
 
-1. MCP 툴 호출 시 `model` 파라미터를 직접 지정
-2. 서버 시작 전 `NANOBANANA_DEFAULT_MODEL` 환경 변수로 기본값 변경
+## Supported Models
 
-지원 모델:
+| Model | Notes |
+| --- | --- |
+| `gemini-3.1-flash-image-preview` | 기본값. 빠른 이미지 생성과 검색 그라운딩에 적합 |
+| `gemini-3-pro-image-preview` | 더 높은 품질과 프롬프트 충실도가 필요할 때 적합 |
+| `gemini-2.5-flash-image` | 지원됨. 다만 `image_size`는 자동 무시 |
 
-- `gemini-3.1-flash-image-preview`
-- `gemini-3-pro-image-preview`
-- `gemini-2.5-flash-image`
+모델 변경 방식:
+
+1. MCP 툴 호출 시 `model` 파라미터 직접 지정
+2. 서버 시작 전 `NANOBANANA_DEFAULT_MODEL` 환경 변수로 기본값 지정
 
 예시:
 
@@ -181,9 +187,9 @@ Windows:
 }
 ```
 
-## 사용 예시
+## Example Prompts
 
-### 1. 텍스트로 이미지 생성
+### Text-to-image
 
 ```json
 {
@@ -194,7 +200,7 @@ Windows:
 }
 ```
 
-### 2. 로컬 이미지를 기반으로 편집
+### Image edit
 
 ```json
 {
@@ -204,7 +210,7 @@ Windows:
 }
 ```
 
-### 3. 검색 그라운딩으로 인포그래픽 생성
+### Grounded infographic
 
 ```json
 {
@@ -214,9 +220,9 @@ Windows:
 }
 ```
 
-## 출력 파일 위치
+## Output
 
-기본적으로 결과는 `generated_images/<timestamp>/` 아래에 저장됩니다.
+기본적으로 생성 결과는 `generated_images/<timestamp>/` 아래에 저장됩니다.
 
 ```text
 generated_images/
@@ -224,24 +230,23 @@ generated_images/
     candidate_00_part_00.png
 ```
 
-## 주의사항
+## Operational Notes
 
 - Google 문서상 생성된 모든 이미지에는 SynthID 워터마크가 포함됩니다.
-- `gemini-2.5-flash-image`는 이 MCP 서버에서 정식 지원합니다.
-- 다만 `gemini-2.5-flash-image`는 문서상 `imageSize`를 지원하지 않아서, 이 서버에서는 `image_size`가 들어와도 에러를 내지 않고 자동 무시합니다.
-- 따라서 README의 다른 예시에서 `image_size`를 보고 그대로 복사하더라도, 모델을 `gemini-2.5-flash-image`로 바꿨다면 해당 값은 적용되지 않습니다.
-- 이미지 검색 그라운딩을 켜면 소스 저작자 표시 요구사항을 지켜야 합니다. 응답에 `grounding_metadata`를 그대로 포함해 두었습니다.
+- `gemini-2.5-flash-image`는 지원되지만 `image_size`는 문서상 미지원이라 자동 무시됩니다.
+- 이미지 검색 그라운딩을 켜면 소스 저작자 표시 요구사항을 지켜야 합니다.
+- 실제 비밀값은 README 예시 그대로 커밋하지 말고, 로컬 설정 또는 비밀 관리 방식으로 넣는 것을 권장합니다.
 
-## 간단 검증
+## Verification
 
-실제 API 키 없이 로컬 파이프라인만 빠르게 확인하려면:
+실제 API 키 없이 로컬 파이프라인만 확인하려면:
 
 ```bash
 . .venv/bin/activate
 python scripts/smoke_mock.py
 ```
 
-## PyPI 배포
+## Publishing
 
 배포 파일 생성:
 
@@ -250,12 +255,6 @@ python scripts/smoke_mock.py
 python -m pip install --upgrade build twine
 python -m build
 python -m twine check dist/*
-```
-
-TestPyPI 업로드:
-
-```bash
-python -m twine upload --repository testpypi dist/*
 ```
 
 PyPI 업로드:
@@ -267,5 +266,5 @@ python -m twine upload dist/*
 업로드 전 체크:
 
 - PyPI 프로젝트 이름이 비어 있는지 다시 확인
-- `GEMINI_API_KEY` 같은 실제 비밀값이 파일에 포함되지 않았는지 확인
-- 버전을 다시 올릴 때는 [pyproject.toml](/mnt/c/MY/MCP/nanoBanana/pyproject.toml#L7)의 `version`을 먼저 증가
+- 실제 비밀값이 파일에 포함되지 않았는지 확인
+- 새 릴리스를 올릴 때는 [pyproject.toml](/mnt/c/MY/MCP/nanoBanana/pyproject.toml#L7)의 `version`을 먼저 증가
